@@ -8,6 +8,9 @@ from dotenv import load_dotenv
 # Charger les variables d'environnement depuis un fichier .env
 load_dotenv()
 
+# Créer l'instance de l'application Flask
+app = Flask(__name__)
+
 github_token = os.getenv("GITHUB_TOKEN")
 
 # Fonction de conversion Excel vers JSON
@@ -20,7 +23,6 @@ def convert_excel_to_json(file_path, output_json_path):
     column_groups = {
         "Competence": ['Compétence / responsabilité'],
         "EntiteFocus": ['Entité(s) en focus (contexte)'],
-        # Ajouter d'autres groupes selon ton script
     }
 
     for new_column, columns in column_groups.items():
@@ -35,13 +37,13 @@ def convert_excel_to_json(file_path, output_json_path):
         f.write(json_data)
 
 # Fonction pour envoyer le fichier JSON sur GitHub
-def upload_to_github(json_file_path, github_repo, github_token, path_in_repo):
+def upload_to_github(json_file_path, github_repo, path_in_repo):
     # Lire le fichier JSON et le convertir en base64
     with open(json_file_path, 'rb') as file:
         content = base64.b64encode(file.read()).decode()
 
-    # URL pour l'API GitHub
-    api_url = f"https://github.com/Seb19861986/competences_locales/blob/main/DataTest.json"
+    # URL pour l'API GitHub (pour un fichier spécifique dans le dépôt)
+    api_url = f"https://api.github.com/repos/{github_repo}/contents/{path_in_repo}"
 
     # Préparer les données pour l'API
     data = {
@@ -50,7 +52,7 @@ def upload_to_github(json_file_path, github_repo, github_token, path_in_repo):
         "branch": "main"  # Si tu utilises une branche différente, remplace "main" par le nom de ta branche
     }
 
-    # Faire la requête PUT à l'API GitHub
+    # Faire la requête PUT à l'API GitHub pour créer ou mettre à jour le fichier
     response = requests.put(
         api_url,
         json=data,
@@ -93,11 +95,10 @@ def upload_file():
 
             # Configuration de GitHub
             github_repo = "Seb19861986/competences_locales"  # Remplace par ton utilisateur et ton dépôt
-            github_token = os.getenv("GITHUB_TOKEN")  # Assure-toi que le token est dans un fichier .env
             path_in_repo = "DataTest.json"  # Remplace par le chemin du fichier dans le dépôt
 
             # Appeler la fonction pour envoyer le fichier JSON sur GitHub
-            upload_status = upload_to_github(output_json_path, github_repo, github_token, path_in_repo)
+            upload_status = upload_to_github(output_json_path, github_repo, path_in_repo)
 
             return upload_status
         except Exception as e:
