@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 # Charger les variables d'environnement depuis un fichier .env
 load_dotenv()
 
-app = Flask(__name__)
+github_token = os.getenv("GITHUB_TOKEN")
 
 # Fonction de conversion Excel vers JSON
 def convert_excel_to_json(file_path, output_json_path):
