@@ -44,5 +44,23 @@ def upload_form():
 def upload_file():
     file = request.files['file']
     if file and file.filename.endswith('.xlsx'):
+        # Créer le dossier uploads si nécessaire
+        if not os.path.exists('uploads'):
+            os.makedirs('uploads')
+        
         # Sauvegarder le fichier temporairement
-        temp_file_path = os.path.join('uploads'), 
+        temp_file_path = os.path.join('uploads', file.filename)
+        file.save(temp_file_path)
+
+        # Convertir le fichier Excel en JSON
+        output_json_path = os.path.join('uploads', file.filename.replace('.xlsx', '.json'))
+        convert_excel_to_json(temp_file_path, output_json_path)
+
+        # Retourner le fichier JSON comme réponse
+        return send_file(output_json_path, as_attachment=True)
+    return "Invalid file format. Please upload an Excel file."
+
+if __name__ == "__main__":
+    # Utiliser le port fourni par Render ou 5000 par défaut
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
