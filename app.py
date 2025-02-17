@@ -45,4 +45,4 @@ def upload_file():
     file = request.files['file']
     if file and file.filename.endswith('.xlsx'):
         # Sauvegarder le fichier temporairement
-        temp_file_path = os.path.join('uploads', 
+        temp_file_path = os.path.join('uploads'), 
