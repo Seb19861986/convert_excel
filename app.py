@@ -3,16 +3,11 @@ import pandas as pd
 import os
 import requests
 import base64
-from dotenv import load_dotenv
 
-# Charger les variables d'environnement depuis un fichier .env
-load_dotenv()
-
-# Créer l'instance de l'application Flask
 app = Flask(__name__)
 
-github_token = os.getenv("GITHUB_TOKEN")
-print(f"Token récupéré : {github_token}")
+# Remplacer par ton vrai token GitHub ici
+GITHUB_TOKEN = "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"  # Insère ici ton nouveau token GitHub
 
 # Fonction de conversion Excel vers JSON
 def convert_excel_to_json(file_path, output_json_path):
@@ -20,7 +15,6 @@ def convert_excel_to_json(file_path, output_json_path):
     df = excel_data.parse(excel_data.sheet_names[0])
     df.columns = df.columns.str.strip()
 
-    # Exemple de groupes de colonnes à concaténer
     column_groups = {
         "Competence": ['Compétence / responsabilité'],
         "EntiteFocus": ['Entité(s) en focus (contexte)'],
@@ -39,25 +33,21 @@ def convert_excel_to_json(file_path, output_json_path):
 
 # Fonction pour envoyer le fichier JSON sur GitHub
 def upload_to_github(json_file_path, github_repo, path_in_repo):
-    # Lire le fichier JSON et le convertir en base64
     with open(json_file_path, 'rb') as file:
         content = base64.b64encode(file.read()).decode()
 
-    # URL pour l'API GitHub (pour un fichier spécifique dans le dépôt)
     api_url = f"https://api.github.com/repos/{github_repo}/contents/{path_in_repo}"
 
-    # Préparer les données pour l'API
     data = {
         "message": "Mise à jour du fichier JSON",
         "content": content,
-        "branch": "main"  # Si tu utilises une branche différente, remplace "main" par le nom de ta branche
+        "branch": "main"  # Si tu utilises une autre branche, remplace "main" par le nom de ta branche
     }
 
-    # Faire la requête PUT à l'API GitHub pour créer ou mettre à jour le fichier
     response = requests.put(
         api_url,
         json=data,
-        headers={"Authorization": f"token {github_token}"}
+        headers={"Authorization": f"token {GITHUB_TOKEN}"}  # Utilisation directe du token dans l'en-tête
     )
 
     if response.status_code == 201:
@@ -82,23 +72,18 @@ def upload_file():
     file = request.files['file']
     if file and file.filename.endswith('.xlsx'):
         try:
-            # Créer le dossier uploads si nécessaire
             if not os.path.exists('uploads'):
                 os.makedirs('uploads')
             
-            # Sauvegarder le fichier temporairement
             temp_file_path = os.path.join('uploads', file.filename)
             file.save(temp_file_path)
 
-            # Convertir le fichier Excel en JSON
             output_json_path = os.path.join('uploads', file.filename.replace('.xlsx', '.json'))
             convert_excel_to_json(temp_file_path, output_json_path)
 
-            # Configuration de GitHub
             github_repo = "Seb19861986/competences_locales"  # Remplace par ton utilisateur et ton dépôt
             path_in_repo = "DataTest.json"  # Remplace par le chemin du fichier dans le dépôt
 
-            # Appeler la fonction pour envoyer le fichier JSON sur GitHub
             upload_status = upload_to_github(output_json_path, github_repo, path_in_repo)
 
             return upload_status
@@ -107,6 +92,5 @@ def upload_file():
     return "Invalid file format. Please upload an Excel file.", 400
 
 if __name__ == "__main__":
-    # Utiliser le port fourni par Render ou 5000 par défaut
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
