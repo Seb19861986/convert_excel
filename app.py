@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, render_template  # Assure-toi que 'render_template' est importé
 import pandas as pd
 import os
 
@@ -10,11 +10,9 @@ def convert_excel_to_json(file_path, output_json_path):
     df = excel_data.parse(excel_data.sheet_names[0])
     df.columns = df.columns.str.strip()
 
-    # Exemple de groupes de colonnes à concaténer
     column_groups = {
         "Competence": ['Compétence / responsabilité'],
         "EntiteFocus": ['Entité(s) en focus (contexte)'],
-        # Ajouter d'autres groupes selon ton script
     }
 
     for new_column, columns in column_groups.items():
@@ -30,8 +28,7 @@ def convert_excel_to_json(file_path, output_json_path):
 
 @app.route('/')
 def upload_form():
-    # Flask va chercher le fichier 'index.html' dans le dossier 'templates'
-    return render_template('index.html')
+    return render_template('index.html')  # Flask rendra le fichier index.html du dossier templates
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
