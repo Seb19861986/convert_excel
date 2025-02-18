@@ -30,15 +30,8 @@ def convert_excel_to_json(file_path, output_json_path):
 
 @app.route('/')
 def upload_form():
-    return '''
-        <html><body>
-        <h2>Upload Excel File</h2>
-        <form action="/upload" method="post" enctype="multipart/form-data">
-            <input type="file" name="file" />
-            <input type="submit" value="Upload File" />
-        </form>
-        </body></html>
-    '''
+    # Flask va chercher le fichier 'index.html' dans le dossier 'templates'
+    return render_template('index.html')
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
