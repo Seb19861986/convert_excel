@@ -12,6 +12,7 @@ load_dotenv()
 app = Flask(__name__)
 
 github_token = os.getenv("GITHUB_TOKEN")
+print(f"Token récupéré : {github_token}")
 
 # Fonction de conversion Excel vers JSON
 def convert_excel_to_json(file_path, output_json_path):
