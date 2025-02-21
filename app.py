@@ -16,7 +16,7 @@ def convert_excel_to_json(file_path, output_json_path):
     }
 
     for new_column, columns in column_groups.items():
-        df[new_column] = df[columns].apply(lambda x: ' - '.join(x.dropna().astype(str)), axis=1)
+        df[new_column] = df[columns].apply(lambda x: ''.join(x.dropna().astype(str)), axis=1)
 
     columns_to_drop = sum(column_groups.values(), [])
     df_cleaned = df.drop(columns=[col for col in columns_to_drop if col in df.columns])
